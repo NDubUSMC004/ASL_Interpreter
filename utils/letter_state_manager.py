@@ -55,7 +55,7 @@ class LetterStateManager:
                 self.detection_count = 0  # Reset detection count since the letter hasn't changed
 
                 # Add space if the same letter is seen consistently beyond the threshold
-                if self.same_letter_count >= 3 * self.confirmation_threshold:
+                if self.same_letter_count >= 2 * self.confirmation_threshold:
                     if self.word and self.word[-1] != ' ':
                         self.word.append(' ')  # Only add space if the last letter isn't a space
                     self.same_letter_count = 0  # Reset counter after adding space

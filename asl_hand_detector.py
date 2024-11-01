@@ -1,4 +1,3 @@
-
 import cv2
 import mediapipe as mp
 from utils.letter_dictionary import get_letter_dict
@@ -19,7 +18,10 @@ draw_landmarks = False
 # Initialize the letter state manager
 confirmation_threshold = 15
 state_manager = LetterStateManager(confirmation_threshold)
-hands_off_screen = False
+
+# Variables for handling hands off-screen
+hands_off_frame_count = 0  # Counter for frames with no hands detected
+off_screen_reset_limit = 2 * confirmation_threshold  # Limit for off-screen frames before resetting
 
 while capture.isOpened():
     ret, frame = capture.read()
@@ -37,17 +39,20 @@ while capture.isOpened():
         for hand_landmarks in landmarks:
             mp_drawing.draw_landmarks(frame, hand_landmarks, mp.solutions.hands.HAND_CONNECTIONS)
 
-    # Update state variables if hand is detected
+    # Check if hand landmarks are detected
     if landmarks:
-        if hands_off_screen:  # Hands have returned after leaving screen
+        if hands_off_frame_count >= off_screen_reset_limit:
+            # Reset the state only if hands were off-screen long enough before returning
             state_manager.reset_state()
-            hands_off_screen = False
 
-        # Update the letter state
+        # Reset the hands-off screen counter now that hands are back
+        hands_off_frame_count = 0
+
+        # Update the letter state with the detected letter
         state_manager.update_letter(new_letter)
     else:
-        # Set flag for hands leaving the screen
-        hands_off_screen = True
+        # Increment counter when hands are off-screen
+        hands_off_frame_count += 1
 
     # Display the current word on the screen
     current_word = state_manager.get_word()
@@ -55,7 +60,11 @@ while capture.isOpened():
 
     # Show the frame
     cv2.imshow('ASL Hand Detector', frame)
-    if cv2.waitKey(1) & 0xFF == 27:
+    # Reset state when 'r' is pressed
+    if cv2.waitKey(1) & 0xFF == ord("r"):
+        state_manager.reset_state()
+    # Close program when 'esc' is pressed
+    elif cv2.waitKey(1) & 0xFF == 27:
         break
 
 capture.release()

@@ -15,6 +15,8 @@ from gestures.letter_n import is_letter_n
 from gestures.letter_o import is_letter_o
 from gestures.letter_p import is_letter_p
 from gestures.letter_q import is_letter_q
+
+from gestures.letter_t import is_letter_t
 from gestures.letter_y import is_letter_y
 
 from gestures.middle_finger import is_middle_finger
@@ -41,6 +43,9 @@ def get_letter_dict():
         "O": is_letter_o,
         "P": is_letter_p,
         "Q": is_letter_q,
+
+        "T": is_letter_t,
+        
         "Y": is_letter_y,
 
         "That is rude!": is_middle_finger
